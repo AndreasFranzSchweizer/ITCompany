@@ -157,4 +157,3 @@ class ComputerStore():
 my_customer = Customer("Tony")
 my_order = Order(my_customer)
 my_order.add_item(Hardware(120,"NIC", 200.0, "The best", 20.0))
-print(my_order.total_cost())
