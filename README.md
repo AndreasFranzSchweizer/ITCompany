@@ -1,1 +1,1 @@
-IT Company practice exapmple.
+IT Company practice example.
