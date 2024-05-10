@@ -1,0 +1,93 @@
+@startuml
+abstract class Article {
+    - description: str
+    + Article(description: str)
+    + get_description(): str
+}
+class Hardware {
+    - model: str
+    - _price: float
+    - _weight: float
+    - stock_quantity: int
+    + Hardware(model: str, price: float, weight: float, description: str, stock_quantity: int)
+    + get_price(): float
+    + get_weight(): float
+}
+class Software {
+    - name: str
+    - version: str
+    - download_link: str
+    + Software(name: str, version: str, description: str, download_link: str)
+    + get_price(): float
+    + get_weight(): float
+}
+class Customer {
+    - name: str
+    + Customer(name: str)
+}
+class Order {
+    - customer: Customer
+    - items: List[Article]
+    + Order(customer: Customer)
+    + add_item(item: Article)
+    + remove_item(item: Article)
+    + total_cost(): float
+    + total_weight(): float
+    + calculate_shipping_cost(shipping_provider: ShippingProvider): float
+}
+class Invoice {
+    - order: Order
+    - shipping_cost: float
+    + Invoice(order: Order, shipping_cost: float)
+    + generate_invoice(): str
+}
+abstract class PaymentMethod {
+    + PaymentMethod()
+    + pay(amount: float): str
+}
+class CreditCard {
+    - card_number: str
+    - expiration_date: str
+    - cvv: str
+    + CreditCard(card_number: str, expiration_date: str, cvv: str)
+    + pay(amount: float): str
+}
+class Cash {
+    + Cash()
+    + pay(amount: float): str
+}
+abstract class ShippingProvider {
+    + ShippingProvider()
+    + ship(order: Order): str
+    + calculate_shipping_cost(order: Order): float
+}
+class FedEx {
+    + FedEx()
+    + ship(order: Order): str
+    + calculate_shipping_cost(order: Order): float
+}
+class UPS {
+    + UPS()
+    + ship(order: Order): str
+    + calculate_shipping_cost(order: Order): float
+}
+class ComputerStore {
+    - shipping_provider: ShippingProvider
+    + ComputerStore(shipping_provider: ShippingProvider)
+    + process_order(order: Order)
+}
+Customer "1" -- "0..*" Order : places
+Order "1" -- "1" Invoice : contains
+ComputerStore "1" -- "0..*" Order : processes
+
+Order "1" -- "0..*" Article : contains
+Order "1" *-- "1" PaymentMethod : uses
+Order "1" *-- "1" ShippingProvider : ships
+
+Article <|-- Hardware
+Article <|-- Software
+PaymentMethod <|-- CreditCard
+PaymentMethod <|-- Cash
+ShippingProvider <|-- FedEx
+ShippingProvider <|-- UPS
+@enduml
