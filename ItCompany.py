@@ -5,11 +5,11 @@ class ShippingProvider(ABC):
         pass
 
     @abstractmethod
-    def ship(order : "Order") -> str:
+    def ship(self, order : "Order") -> str:
         pass
     
     @abstractmethod
-    def calaculate_shipping_cost(order: "Order") -> float:
+    def calaculate_shipping_cost(self, order: "Order") -> float:
         pass
 
 
@@ -17,20 +17,20 @@ class FedEx(ShippingProvider):
     def __init__(self):
         pass
 
-    def ship(order : "Order") -> str:
+    def ship(self, order : "Order") -> str:
         return "Shipped with FedEx"
 
-    def calaculate_shipping_cost(order: "Order") -> float:
-        pass
+    def calaculate_shipping_cost(self, order: "Order") -> float:
+        return order.total_weight() * 1.5
 
 class UPS(ShippingProvider):
     def __init__(self):
         pass
 
-    def ship(order : "Order") -> str:
+    def ship(self, order : "Order") -> str:
         return "Shipped with UPS"
 
-    def calaculate_shipping_cost(order: "Order") -> float:
+    def calaculate_shipping_cost(self, order: "Order") -> float:
         pass
 
 
@@ -39,7 +39,7 @@ class PaymentMethod(ABC):
         pass
 
     @abstractmethod
-    def pay(amount: float) -> str:
+    def pay(self, amount: float) -> str:
         pass
 
 
@@ -49,7 +49,7 @@ class CreditCard(PaymentMethod):
         self._expiration_date = expiration_date
         self._cvv = cvv
 
-    def pay(amount: float) -> str:
+    def pay(self, amount: float) -> str:
         print(f"{amount} payed with Credit Card")
 
 
@@ -57,7 +57,7 @@ class Cash(PaymentMethod):
     def __init__(self):
         pass
 
-    def pay(amount: float) -> str:
+    def pay(self, amount: float) -> str:
         print(f"{amount} payed cash")
 
 
@@ -137,23 +137,45 @@ class Order():
     def total_weight(self) -> float:
         total = 0.0
         for item in self._items:
-            if item is Hardware:
+            if isinstance(item, Hardware):
                 total += item.get_weight()
 
-    def calaculate_shipping_cost(shipping_provider: "Shipping_Provider") -> float:
+        return total
+
+    def calaculate_shipping_cost(self, shipping_provider: "Shipping_Provider") -> float:
         return shipping_provider.calaculate_shipping_cost(self)
+    
+    
+
+class Invoice():
+    def __init__(self, order: "Order", shipping_cost: float):
+        self._order = order
+        self._shipping_cost = shipping_cost
+
+
+    def generate_invoice(self):
+        print(f"Order total: {self._order.total_cost()}")
+        print(f"Shipping cost: {self._shipping_cost}")
+        print(f"Total: {self._order.total_cost() + self._shipping_cost}")
 
 
 class ComputerStore():
-    def __init__(self, shipping_provider: "Shipping_Provider"):
-        self._shipping_provider = shipping_provider
-    
-    def process_order(self, order: "Order"):
+    def __init__(self):
+        pass
+
+    def process_order(self, order: "Order", shipping_provider: "ShippingProvider"):
         print("Process Order")
-        total_shipping_cost = order.calaculate_shipping_cost(self._shipping_provider)
+        total_shipping_cost = order.calaculate_shipping_cost(shipping_provider)
         print(f"Total shipping cost {total_shipping_cost}")
 
 
 my_customer = Customer("Tony")
 my_order = Order(my_customer)
 my_order.add_item(Hardware(120,"NIC", 200.0, "The best", 20.0))
+my_order.add_item(Software(30, "Windows", "10", "www.microsoft.com"))
+my_order.add_item(Hardware(120,"NIC", 200.0, "The best", 20.0))
+
+store = ComputerStore()
+store.process_order(my_order, FedEx())
+invoice = Invoice(my_order, my_order.calaculate_shipping_cost(FedEx()))
+invoice.generate_invoice()
