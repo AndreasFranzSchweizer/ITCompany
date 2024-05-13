@@ -15,6 +15,7 @@ class ShippingProvider(ABC):
 
 class FedEx(ShippingProvider):
     def __init__(self):
+        super().__init__()
         pass
 
     def ship(self, order : "Order") -> str:
@@ -25,13 +26,14 @@ class FedEx(ShippingProvider):
 
 class UPS(ShippingProvider):
     def __init__(self):
+        super().__init__()
         pass
 
     def ship(self, order : "Order") -> str:
         return "Shipped with UPS"
 
     def calaculate_shipping_cost(self, order: "Order") -> float:
-        pass
+        return order.total_weight() * 1.2 + 10.0
 
 
 class PaymentMethod(ABC):
@@ -45,6 +47,7 @@ class PaymentMethod(ABC):
 
 class CreditCard(PaymentMethod):
     def __init__(self, card_number: str, expiration_date: str, cvv: str):
+        super().__init__()
         self.card_number = card_number
         self._expiration_date = expiration_date
         self._cvv = cvv
@@ -55,6 +58,7 @@ class CreditCard(PaymentMethod):
 
 class Cash(PaymentMethod):
     def __init__(self):
+        super().__init__()
         pass
 
     def pay(self, amount: float) -> str:
